@@ -1,0 +1,1 @@
+this are demos taken from http://matplotlib.org/1.4.1/examples/animation/index.html to play around
