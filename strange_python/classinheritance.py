@@ -1,10 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Feb  2 13:44:03 2016
-
-@author: gruenewa
-"""
-
 class Shape():
     counter = 0   
     def __init__(self):
