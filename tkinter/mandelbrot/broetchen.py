@@ -13,22 +13,15 @@ class mandelbrot():
         
         
 class calculator():
-    def generate_broetchen(self, x_points, y_points):
+    def generate_broetchen(self, x_points, y_points, bounding_box = [-1.75, 0.5, -1, 1]):
         boundary = 2.0
         mb = mandelbrot()
-        c_re_min = -1.75
-        c_re_max = 0.5
-        c_im_min = -1
-        c_im_max = 1
+        c_re_min, c_re_max, c_im_min, c_im_max = bounding_box
         
         grid = np.zeros((x_points, y_points))
         c_re = np.linspace(c_re_min, c_re_max, num=x_points)
         c_im = np.linspace(c_im_min, c_im_max, num=y_points)
-        
-        grid_x = []
-        grid_y = []
-        grid_color = []
-        
+
         x = -1    
         y = -1
         for c_re_current in c_re:
@@ -43,23 +36,16 @@ class calculator():
                     z = mb.calculate(z, c)
                     if abs(z) > boundary:
                         break
-                    
-                # grid_x.append(c_re_current)    
-                # grid_y.append(c_im_current)
                 
-                if abs(z) > boundary:                                        
-                    # grid_color.append(1)
+                if abs(z) > boundary:                                      
                     grid[x,y] = 1
-                else:
-                    # grid_color.append(0)                
+                else:              
                     grid[x,y] = 0
      
         return grid        
         
-        # plt.scatter(grid_x, grid_y, c=grid_color, alpha=0.5)
-        # plt.show()
 
-
+# old renderer, use render.py instead
 class Renderer(tk.Frame):
     def __init__(self, root):
         
