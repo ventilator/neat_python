@@ -2,21 +2,22 @@
 
 import tkinter
 from PIL import Image, ImageTk
-import numpy
+import numpy as np
 import time
 import broetchen
 
 class mainWindow():
         times=1
         timestart=time.clock()
-        dimension_x = 400
-        dimension_y = 400
+        dimension_x = 800
+        dimension_y = 800
 
         print("calculating")
         pixelator = 1
         mandala = broetchen.calculator()        
         data = mandala.generate_broetchen(dimension_x/pixelator, dimension_y/pixelator)
-        data = data*100
+        data = data*15
+        data = np.rot90(data)
         print("%.02f s done"%(time.clock()-timestart))
         timestart=time.clock()
         print("rendering")
@@ -26,7 +27,8 @@ class mainWindow():
                 self.frame = tkinter.Frame(self.root, width=self.dimension_x, height=self.dimension_y)
                 self.frame.pack()
                 self.canvas = tkinter.Canvas(self.frame, width=self.dimension_x, height=self.dimension_y)
-                self.canvas.place(x=-2,y=-2)
+                #self.canvas.place(x=-2,y=-2)
+                self.canvas.grid(sticky="NSWE")
                 self.root.after(0,self.start) # INCREASE THE 0 TO SLOW IT DOWN
                 self.root.mainloop()
                 
@@ -46,3 +48,4 @@ class mainWindow():
 
 if __name__ == '__main__':
     x=mainWindow()
+    

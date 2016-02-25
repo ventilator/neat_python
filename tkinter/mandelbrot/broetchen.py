@@ -3,19 +3,45 @@
 
 """
 import numpy as np
-import matplotlib.pyplot as plt
 import tkinter as tk
-
+from numba import autojit
 
 class mandelbrot():
-    def calculate(self, z, c):
+    boundary = 2.0
+    boundary_squared = boundary * boundary
+        
+    def f(self, z, c):
         return z*z + c
+            
+    def calculate(self, c):    
+        z0 = 0 + 0*1j
+        z = z0     
         
+        for i in range(20):        
+            z = self.f(z, c)
+            # if abs(z) > self.boundary: # next line yields same result, but is a bit faster (https://www.ibm.com/developerworks/community/blogs/jfp/entry/How_To_Compute_Mandelbrodt_Set_Quickly?lang=en)
+            if z.real * z.real + z.imag * z.imag > self.boundary_squared:
+                return i
         
+        return 0
+        
+
+# function is 10x faster than class above. Class above does not accept autojit for unknown reason
+@autojit
+def mandel(x, y, max_iters):
+  c = complex(x, y)
+  z = 0.0j
+  for i in range(max_iters):
+    z = z*z + c
+    if (z.real*z.real + z.imag*z.imag) >= 4:
+      return i
+  return max_iters
+
+      
 class calculator():
     def generate_broetchen(self, x_points, y_points, bounding_box = [-1.75, 0.5, -1, 1]):
-        boundary = 2.0
-        mb = mandelbrot()
+        
+        # mb = mandelbrot()
         c_re_min, c_re_max, c_im_min, c_im_max = bounding_box
         
         grid = np.zeros((x_points, y_points))
@@ -28,19 +54,11 @@ class calculator():
             x += 1
             y = -1
             for c_im_current in c_im:
-                y += 1            
-                z0 = 0 + 0*1j
-                z = z0
-                c = c_re_current + c_im_current*1j
-                for i in range(20):        
-                    z = mb.calculate(z, c)
-                    if abs(z) > boundary:
-                        break
-                
-                if abs(z) > boundary:                                      
-                    grid[x,y] = 1
-                else:              
-                    grid[x,y] = 0
+                y += 1                            
+                # disabled slower variant 
+                    # c = c_re_current + c_im_current*1j                
+                    # grid[x,y] = mb.calculate(c)
+                grid[x,y] = mandel(c_re_current, c_im_current, 20)
      
         return grid        
         
@@ -48,8 +66,6 @@ class calculator():
 # old renderer, use render.py instead
 class Renderer(tk.Frame):
     def __init__(self, root):
-        
-        
         
         tk.Frame.__init__(self, root)
         
@@ -81,12 +97,31 @@ class Renderer(tk.Frame):
                     
 
 
-if __name__ == "__main__":
-    root = tk.Tk()
-    Renderer(root).pack(fill="both", expand=True)
-    root.mainloop()
+#if __name__ == "__main__":
+#    root = tk.Tk()
+#    Renderer(root).pack(fill="both", expand=True)
+#    root.mainloop()
     
-# main()        
+def test_run():
+    mandala = calculator()        
+    data = mandala.generate_broetchen(200, 200)    
+    
+#if __name__ == '__main__':    
+#    import profile 
+#    profile.run('test_run()')   
+    
+    #930295 function calls in 3.011 seconds
+    
+if __name__ == '__main__':   
+    from timeit import default_timer as timer
+    start = timer()
+    
+    test_run()
+    
+    dt = timer() - start
+    print ("Mandelbrot created in %f s" % dt)
+    
+  
 
 
 
